@@ -1,10 +1,9 @@
-var express = require('express');
-var router = express.Router();
+var router = require('express').Router();
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.send("Welcome To @DoorSetp API !")
-  // res.render('index', { title: '@DoorStep' });
 });
 
 module.exports = router;
