@@ -1,38 +1,77 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require("http-errors");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const morgan = require("morgan");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const app = express();
+const db = require("./common/database/MongoDB");
+const rateLimit = require("express-rate-limit");
+const winston = require("./common/winston");
+const fileUpload = require('express-fileupload');
+const compression = require('compression');
+const { errorHandlerMiddleware, errorHandler } = require("./common/error");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
+const indexRouter=require("./routes/index");
+// const cron = require('./api/v1.0/modules/cron/cron');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 
-var app = express();
+// HTTP request logger middleware for node.js
+app.use(morgan("combined", { stream: winston.stream }));
 
+/**
+ * Parse incoming request bodies in a middleware before your handlers,
+ * available under the req.body property.
+ */
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// Parse Cookie header and populate req.cookies
 app.use(cookieParser());
-app.use('/static',express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+/**
+ * CORS is a node.js package for providing a Connect/Express middleware
+ * that can be used to enable CORS with various options.
+ */
+app.use(cors());
+app.use(fileUpload());
+app.use(compression());
+
+app.use(express.static(path.join(__dirname, "public")));
+
+
+/**
+ * apply to all requests
+ * Note - Rate Limiter can be applied to any individual API also. For more information
+ * Please visit https://www.npmjs.com/package/express-rate-limit
+ */
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+  })
+);
+
+
+// API Calling
+app.use("/",indexRouter);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/api", require("./api"));
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+process.on("uncaughtException", function (err) {
+  errorHandler(err);
+});
 
-  // render the error page
-  res.status(err.status || 500);
-  res.send('error');
+// error handler
+app.use(function (err, req, res, next) {
+  errorHandlerMiddleware(err, req, res);
 });
 
 module.exports = app;
