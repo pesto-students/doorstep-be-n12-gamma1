@@ -2,7 +2,7 @@ const dotenv=require("dotenv");
 dotenv.config();
 
 module.exports = {
-    port: process.env[`${process.env.NODE_ENV}_PORT`],
+    port: process.env[`PORT`],
     databaseUser: process.env[`${process.env.NODE_ENV}_DB_USER`],
     databasePassword: process.env[`${process.env.NODE_ENV}_DB_PASSWORD`],
     databaseName: process.env[`${process.env.NODE_ENV}_DB_NAME`],
