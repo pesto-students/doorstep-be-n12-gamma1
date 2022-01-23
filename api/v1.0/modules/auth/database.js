@@ -1,15 +1,23 @@
-const User = require('./schema');
+const Admin = require('../../models/admin');
 const { connection_failed } = require('../../../../common/statusCode');
+const CartSchema=require("../../models/cart");
+const UserSchema = require("../../models/user");
 
-class UserDatabase {
+class AuthDatabase {
     /**
-     * Database call to check if user exists
+     * Database call to check if Admin exists
      * @param {*} req (email address & mobileNumber)
      * @param {*} res (json with success/failure)
      */
-    async checkIfuserExists(info) {
+    async checkIfUserExists(info) {
+      let details;
       try {
-        const details = await User.find({ emailAddress: info });
+        if(info==="Admin")
+        details = await Admin.find({ emailAddress: info.emailAddress });
+        else{
+          const User=UserSchema(info.prefix);
+          details = await User.find({ emailAddress: info.emailAddress });
+        }
         return details;
       } catch (error) {
         throw {
@@ -21,14 +29,34 @@ class UserDatabase {
     }
   
     /**
-     * Database call for inserting user information
-     * @param {*} req (user details)
+     * Database call for inserting admin information
+     * @param {*} req (admin details)
      * @param {*} res (json with success/failure)
      */
     async userRegistration(info) {
-      const user = new User(info);
+      const admin = new Admin(info);
       try {
-        const details = await user.save();
+        const details = await admin.save();
+        return details;
+      } catch (error) {
+        throw {
+          statusCode: connection_failed,
+          message: error.message,
+          data: JSON.stringify(error),
+        };
+      }
+    }
+
+    /**
+     * Database call for inserting admin information
+     * @param {*} req (admin details)
+     * @param {*} res (json with success/failure)
+     */
+     async createCart(info) {
+      const Cart=CartSchema(info.prefix);
+      const cart = new Cart(info);
+      try {
+        const details=await cart.save();
         return details;
       } catch (error) {
         throw {
@@ -41,7 +69,7 @@ class UserDatabase {
 }
 
 module.exports = {
-    userDatabase: function () {
-      return new UserDatabase();
+    authDatabase: function () {
+      return new AuthDatabase();
     },
   };

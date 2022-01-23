@@ -9,10 +9,14 @@ const app = express();
 const db = require("./common/database/MongoDB");
 const rateLimit = require("express-rate-limit");
 const winston = require("./common/winston");
+const fileUpload = require('express-fileupload');
+const compression = require('compression');
 const { errorHandlerMiddleware, errorHandler } = require("./common/error");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
-const indexRouter=require("./routes/index")
+const indexRouter=require("./routes/index");
+// const cron = require('./api/v1.0/modules/cron/cron');
+
 
 // HTTP request logger middleware for node.js
 app.use(morgan("combined", { stream: winston.stream }));
@@ -32,8 +36,11 @@ app.use(cookieParser());
  * that can be used to enable CORS with various options.
  */
 app.use(cors());
+app.use(fileUpload());
+app.use(compression());
 
 app.use(express.static(path.join(__dirname, "public")));
+
 
 /**
  * apply to all requests
@@ -46,6 +53,7 @@ app.use(
     max: 100, // limit each IP to 100 requests per windowMs
   })
 );
+
 
 // API Calling
 app.use("/",indexRouter);

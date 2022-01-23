@@ -1,11 +1,14 @@
-const config = require('../config');
-const CryptoJS = require('crypto-js');
-const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
-const randomstring = require('randomstring');
-const fs = require('fs');
-const { errorHandler } = require('./error');
-
+const config = require("../config");
+const CryptoJS = require("crypto-js");
+const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const randomstring = require("randomstring");
+const fs = require("fs");
+const { errorHandler } = require("./error");
+const { Promise } = require("mongoose");
+const { rejects } = require("assert");
+const stripe = require("stripe")(config.stripeKey);
+const { v4: uuidv4 }=require("uuid")
 
 /**
  * Function for Encrypting the data
@@ -33,7 +36,7 @@ function decryptData(data) {
       var userinfo = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
       return userinfo;
     } else {
-      return { userinfo: { error: 'Please send proper token' } };
+      return { userinfo: { error: "Please send proper token" } };
     }
   }
   return data;
@@ -60,7 +63,7 @@ function decryptPassword(data) {
     var userinfo = decrypted.toString(CryptoJS.enc.Utf8);
     return userinfo;
   } else {
-    return { userinfo: { error: 'Please send proper token' } };
+    return { userinfo: { error: "Please send proper token" } };
   }
 }
 
@@ -95,7 +98,7 @@ async function tokenDecrypt(data) {
  * @param {*} data (status, data, token)
  * @param {*} return (encrypted data)
  */
-function responseGenerator(statusCode, message, data = '') {
+function responseGenerator(statusCode, message, data = "") {
   var details = {
     statusCode: statusCode,
     message: message,
@@ -116,7 +119,7 @@ function responseGenerator(statusCode, message, data = '') {
  */
 async function sendEmail(to, subject, message) {
   var transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: {
       user: config.SMTPemailAddress,
       pass: config.SMTPPassword,
@@ -124,7 +127,7 @@ async function sendEmail(to, subject, message) {
   });
 
   var mailOptions = {
-    from: 'developers.winjit@gmail.com',
+    from: "developers.winjit@gmail.com",
     to: to,
     subject: subject,
     html: message,
@@ -146,8 +149,8 @@ async function sendEmail(to, subject, message) {
 function generateRandomString(callback) {
   var referralCode = randomstring.generate({
     length: 9,
-    charset: 'alphanumeric',
-    capitalization: 'uppercase',
+    charset: "alphanumeric",
+    capitalization: "uppercase",
   });
   callback(referralCode);
 }
@@ -157,14 +160,73 @@ function generateRandomString(callback) {
   which used  for generating random password in create user by admin.
 */
 function randomPasswordGenerater(length) {
-  var result = '';
+  var result = "";
   var characters =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   var charactersLength = characters.length;
   for (var i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+}
+
+function getPrefix(data){
+  try{
+  const uuid=uuidv4();
+    const vendor=data.split(" ")[0]
+    const prefix=`${vendor}_${uuid}_`;
+    return prefix
+  } catch (error) {
+    return error;
+  }
+}
+
+function stripePayment(data) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // const [product,token]=data;
+      // const idempotencyKey=uuidv4();
+      const customer =await stripe.customers.create({
+        email:data.token.email,
+        source:data.token.id
+      })
+      //   const result=await stripe.paymentIntents.create({
+      //     payment_method_types: ['card'],
+      //     customer:customer.id,
+      //     amount:data.amount,
+      //     currency: "USD",
+      //     receipt_email:data.token.email,
+      //     payment_method: data.token.card.id,
+      //     error_on_requires_action: true,
+      //     confirm: true,
+      // },{idempotencyKey});
+      
+     
+      // resolve(result)
+   
+      
+      await stripe.paymentIntents.create(
+        {
+          payment_method_types: ['card'],
+          amount: data.amount,
+          currency: "USD",
+          receipt_email:data.token.email,
+          payment_method:data.token.card.id,
+          customer:customer.id,
+          confirm: false
+        },
+        (stripeErr, stripeRes) => {
+          if (stripeErr) {
+            reject(stripeErr);
+          } else {
+            resolve(stripeRes);
+          }
+        }
+      );
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
 /**
@@ -176,27 +238,45 @@ async function uploadFile(fileInfo) {
   try {
     const fileType = fileInfo.fileType;
     const fileName = `${fileInfo.fileName}.${fileType}`;
-    var base64 = fileInfo.base64.split(';base64,')[1];
-    var fileBuffer = new Buffer.from(base64, 'base64');
-    if (!fs.existsSync('./public/' + fileInfo.pathInfo)) {
-      await fs.mkdirSync('./public/' + fileInfo.pathInfo, { recursive: true });
+    // var base64 = fileInfo.base64.split(';base64,')[1];
+    const base64 = fileInfo.base64;
+    // var fileBuffer = new Buffer.from(base64, 'base64');
+    if (!fs.existsSync("./public/" + fileInfo.pathInfo)) {
+      await fs.mkdirSync("./public/" + fileInfo.pathInfo, { recursive: true });
     }
     await fs.writeFileSync(
-      './public/' + fileInfo.pathInfo + fileName,
-      fileBuffer,
-      'utf8'
+      "./public/" + fileInfo.pathInfo + fileName,
+      base64,
+      "utf8"
     );
-    return { fileName: fileName };
+    return { fileName: "./public/" + fileInfo.pathInfo + fileName };
   } catch (e) {
     throw e;
   }
 }
 
+async function convertToJSON(array) {
+  try {
+    console.log("array", array[0]);
+    var first = array[0].join();
+    var headers = first.split(",");
 
+    var jsonData = [];
+    for (var i = 1, length = array.length; i < length; i++) {
+      var myRow = array[i].join();
+      var row = myRow.split(",");
 
-
-
-
+      var data = {};
+      for (var x = 0; x < row.length; x++) {
+        data[headers[x]] = row[x];
+      }
+      jsonData.push(data);
+    }
+    return jsonData;
+  } catch (e) {
+    throw e;
+  }
+}
 
 module.exports = {
   encryptData,
@@ -209,5 +289,8 @@ module.exports = {
   sendEmail,
   generateRandomString,
   randomPasswordGenerater,
-  uploadFile
+  getPrefix,
+  stripePayment,
+  uploadFile,
+  convertToJSON,
 };
