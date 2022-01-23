@@ -36,7 +36,7 @@
     "winston": "^3.3.4",
     "xlsx": "^0.17.5"
   },
-  "engines":{
+  "engines": {
     "node": "16.13.1"
   }
 }

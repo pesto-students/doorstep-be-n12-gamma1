@@ -2,22 +2,22 @@ const dotenv=require("dotenv");
 dotenv.config();
 
 module.exports = {
-    port: process.env[`PORT`],
-    databaseUser: process.env[`${process.env.NODE_ENV}_DB_USER`],
-    databasePassword: process.env[`${process.env.NODE_ENV}_DB_PASSWORD`],
-    databaseName: process.env[`${process.env.NODE_ENV}_DB_NAME`],
-    databasePort: process.env[`${process.env.NODE_ENV}_DB_PORT`],
+    port: process.env['PORT'],
+    databaseUser: process.env['DEV_DB_USER'],
+    databasePassword: process.env['DEV_DB_PASSWORD'],
+    databaseName: process.env['DEV_DB_NAME'],
+    databasePort: process.env['DEV_DB_PORT'],
     mongoDBConnectionStringLocal:
-      process.env[`${process.env.NODE_ENV}_MONGO_URL_LOCAL`],
+      process.env['DEV_MONGO_URL_LOCAL'],
     mongoDBConnectionStringCloud:
-      process.env[`${process.env.NODE_ENV}_MONGO_URL_CLOUD`],  
-    tokenkey: process.env[`${process.env.NODE_ENV}_TOKEN_KEY`],
+      process.env['DEV_MONGO_URL_CLOUD'],  
+    tokenkey: process.env['DEV_TOKEN_KEY'],
     bodyEncryption: false,
-    supportEmail: process.env[`${process.env.NODE_ENV}_SUPPORT_EMAIL`],
-    SMTPemailAddress: process.env[`${process.env.NODE_ENV}_SUPPORT_EMAIL`],
-    SMTPPassword: process.env[`${process.env.NODE_ENV}_SUPPORT_EMAIL_PASSWORD`],
-    cryptokey: process.env[`${process.env.NODE_ENV}_CRYPTO_KEY`],
-    googleClientId:process.env[`${process.env.NODE_ENV}_CLIENT_ID`],
-    backEndHost:process.env[`${process.env.NODE_ENV}_BACKEND_HOST`],
-    stripeKey:process.env[`${process.env.NODE_ENV}_STRPE_SEC_KEY`]
+    supportEmail: process.env['DEV_SUPPORT_EMAIL'],
+    SMTPemailAddress: process.env['DEV_SUPPORT_EMAIL'],
+    SMTPPassword: process.env['DEV_SUPPORT_EMAIL_PASSWORD'],
+    cryptokey: process.env['DEV_CRYPTO_KEY'],
+    googleClientId:process.env['DEV_CLIENT_ID'],
+    backEndHost:process.env['DEV_BACKEND_HOST'],
+    stripeKey:process.env['DEV_STRPE_SEC_KEY']
   };

@@ -174,7 +174,7 @@ function getPrefix(data){
   try{
   const uuid=uuidv4();
     const vendor=data.split(" ")[0]
-    const prefix=`${vendor}_${uuid}_`;
+    const prefix=`${vendor}-${uuid}-`;
     return prefix
   } catch (error) {
     return error;
