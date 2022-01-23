@@ -4,7 +4,7 @@ const Vendor = require("../../models/vendor");
 const CategorySchema = require("../../models/category");
 const ProductSchema = require("../../models/product");
 const config = require("../../../../config");
-const { connection_failed } = require("../../../../common/statusCode");
+const { connection_failed } = require("../../../../common/StatusCode");
 const Cart = require("../../models/cart");
 const stripe = require("stripe")(config.stripeKey);
 

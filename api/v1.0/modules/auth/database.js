@@ -1,5 +1,5 @@
 const Admin = require('../../models/admin');
-const { connection_failed } = require('../../../../common/statusCode');
+const { connection_failed } = require('../../../../common/StatusCode');
 const CartSchema=require("../../models/cart");
 const UserSchema = require("../../models/user");
 

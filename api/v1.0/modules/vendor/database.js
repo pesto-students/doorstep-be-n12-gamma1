@@ -1,5 +1,5 @@
 const Vendor = require('../../models/vendor');
-const { connection_failed } = require('../../../../common/statusCode');
+const { connection_failed } = require('../../../../common/StatusCode');
 
 class VendorDatabase {
   

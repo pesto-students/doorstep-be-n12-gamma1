@@ -1,5 +1,5 @@
 const functions = require('./functions');
-const statusCode = require('./statusCode');
+const statusCode = require('./StatusCode');
 const message = require('./message');
 
 const authenticationController = {

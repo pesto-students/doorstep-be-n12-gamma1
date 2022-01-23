@@ -1,5 +1,5 @@
 const validator = require("validator");
-const statusCode = require("../../../../common/statusCode");
+const statusCode = require("../../../../common/StatusCode");
 const message = require("../../../../common/message");
 const fs = require("fs");
 const db = require("./database");

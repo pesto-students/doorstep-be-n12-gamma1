@@ -1,7 +1,7 @@
 const Vendor = require("../../models/vendor");
 const CategorySchema = require("../../models/category");
 const ProductSchema = require("../../models/product");
-const { connection_failed } = require("../../../../common/statusCode");
+const { connection_failed } = require("../../../../common/StatusCode");
 const functions = require("../../../../common/functions");
 
 
