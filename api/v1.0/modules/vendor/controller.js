@@ -24,14 +24,14 @@ const controller = {
   getVendorDetails: async (req, res, next) => {
     console.log("req",req.files)
     try {
-      const registrationDetails = await object
+      const vendorDetails = await object
         .vendorService()
         .getVendorDetails(req);
       res.send(
         functions.responseGenerator(
-          registrationDetails.statusCode,
-          registrationDetails.message,
-          registrationDetails.data
+          vendorDetails.statusCode,
+          vendorDetails.message,
+          vendorDetails.data
         )
       );
     } catch (error) {

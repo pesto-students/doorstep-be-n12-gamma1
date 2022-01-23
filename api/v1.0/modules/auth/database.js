@@ -12,7 +12,7 @@ class AuthDatabase {
     async checkIfUserExists(info) {
       let details;
       try {
-        if(info==="Admin")
+        if(info.role==="Admin")
         details = await Admin.find({ emailAddress: info.emailAddress });
         else{
           const User=UserSchema(info.prefix);

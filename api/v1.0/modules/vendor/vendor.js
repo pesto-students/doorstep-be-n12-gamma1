@@ -1,11 +1,7 @@
-const functions = require("../../../../common/functions");
-const config = require("../../../../config");
-const validator = require("validator");
 const statusCode = require("../../../../common/StatusCode");
 const message = require("../../../../common/message");
 const fs = require("fs");
 const db = require("./database");
-const xlsx = require("xlsx");
 const Vendor = require("../../models/vendor");
 
 class VendorService {
@@ -43,12 +39,21 @@ class VendorService {
     async getVendorDetails(info) {
       try {
   
-        const vendorDetails = await db.vendorDatabase().getVendorDetails(info);
+        const vendorDetails = await db.vendorDatabase().getVendorDetails();
+        let data=vendorDetails.vendorName.toLowerCase().split(" ");
+        let appName='';
+        data.forEach((element,index) => {
+          if(index==0)
+          appName=`${element}`
+          else
+          appName=`${appName}-${element}`
+        });
+
        
         return {
           statusCode: statusCode.success,
           message: message.success,
-          data: vendorDetails[0],
+          data: {...vendorDetails._doc,appName},
         };
       } catch (error) {
         throw {
