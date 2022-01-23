@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const userSchema = mongoose.Schema(
+const adminSchema = mongoose.Schema(
   {
     fullName: {
       type: String,
@@ -29,9 +29,9 @@ const userSchema = mongoose.Schema(
     },
     profileURL: String,
   },
-  { timestamps: true, collection: "users" }
+  { timestamps: true, collection: "admins" }
 );
 
-const User = mongoose.model("User", userSchema);
+const Admin = mongoose.model("Admin", adminSchema);
 
-module.exports = User;
+module.exports = Admin;

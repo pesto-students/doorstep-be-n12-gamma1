@@ -17,5 +17,7 @@ module.exports = {
     SMTPemailAddress: process.env[`${process.env.NODE_ENV}_SUPPORT_EMAIL`],
     SMTPPassword: process.env[`${process.env.NODE_ENV}_SUPPORT_EMAIL_PASSWORD`],
     cryptokey: process.env[`${process.env.NODE_ENV}_CRYPTO_KEY`],
-    googleClientId:process.env[`${process.env.NODE_ENV}_CLIENT_ID`]
+    googleClientId:process.env[`${process.env.NODE_ENV}_CLIENT_ID`],
+    backEndHost:process.env[`${process.env.NODE_ENV}_BACKEND_HOST`],
+    stripeKey:process.env[`${process.env.NODE_ENV}_STRPE_SEC_KEY`]
   };
