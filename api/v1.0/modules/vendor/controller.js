@@ -1,14 +1,12 @@
-const object = require('./vendor');
-const functions = require('../../../../common/functions');
+const object = require("./vendor");
+const functions = require("../../../../common/functions");
 
 const controller = {
   //Upload File API
   vendorList: async (req, res, next) => {
-    console.log("req",req.files)
+    console.log("req", req.files);
     try {
-      const registrationDetails = await object
-        .vendorService()
-        .vendorList(req);
+      const registrationDetails = await object.vendorService().vendorList(req);
       res.send(
         functions.responseGenerator(
           registrationDetails.statusCode,
@@ -22,11 +20,9 @@ const controller = {
   },
 
   getVendorDetails: async (req, res, next) => {
-    console.log("req",req.files)
+    console.log("req", req.files);
     try {
-      const vendorDetails = await object
-        .vendorService()
-        .getVendorDetails(req);
+      const vendorDetails = await object.vendorService().getVendorDetails(req);
       res.send(
         functions.responseGenerator(
           vendorDetails.statusCode,
@@ -37,7 +33,25 @@ const controller = {
     } catch (error) {
       return next(error);
     }
-  }
-}
+  },
 
-  module.exports = controller;
+  updateVendorDetails: async (req, res, next) => {
+    console.log("req", req.files);
+    try {
+      const updatedVendorDetails = await object
+        .vendorService()
+        .updateVendorDetails(req);
+      res.send(
+        functions.responseGenerator(
+          updatedVendorDetails.statusCode,
+          updatedVendorDetails.message,
+          updatedVendorDetails.data
+        )
+      );
+    } catch (error) {
+      return next(error);
+    }
+  },
+};
+
+module.exports = controller;

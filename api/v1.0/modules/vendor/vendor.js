@@ -3,66 +3,94 @@ const message = require("../../../../common/message");
 const fs = require("fs");
 const db = require("./database");
 const Vendor = require("../../models/vendor");
+const config = require("../../../../config");
 
 class VendorService {
-   /**
+  /**
    * API for user registration
    * @param {*} req (user detials)
    * @param {*} res (json with success/failure)
    */
-    async vendorList(info) {
-      try {
-        if (!info.vendorId) {
-          throw {
-            statusCode: statusCode.bad_request,
-            message: message.badRequest,
-            data: [],
-          };
-        }
-  
-        const vendorList = await db.vendorDatabase().vendorList(info);
-       
-        return {
-          statusCode: statusCode.success,
-          message: message.success,
-          data: vendorList,
-        };
-      } catch (error) {
+  async vendorList(info) {
+    try {
+      if (!info.vendorId) {
         throw {
-          statusCode: error.statusCode,
-          message: error.message,
-          data: JSON.stringify(error),
+          statusCode: statusCode.bad_request,
+          message: message.badRequest,
+          data: [],
         };
       }
+
+      const vendorList = await db.vendorDatabase().vendorList(info);
+
+      return {
+        statusCode: statusCode.success,
+        message: message.success,
+        data: vendorList,
+      };
+    } catch (error) {
+      throw {
+        statusCode: error.statusCode,
+        message: error.message,
+        data: JSON.stringify(error),
+      };
     }
+  }
 
-    async getVendorDetails(info) {
-      try {
-  
-        const vendorDetails = await db.vendorDatabase().getVendorDetails();
-        let data=vendorDetails.vendorName.toLowerCase().split(" ");
-        let appName='';
-        data.forEach((element,index) => {
-          if(index==0)
-          appName=`${element}`
-          else
-          appName=`${appName}-${element}`
-        });
+  async getVendorDetails(info) {
+    try {
+      const vendorDetails = await db.vendorDatabase().getVendorDetails();
+      let data = vendorDetails.vendorName.toLowerCase().split(" ");
+      let appName = "";
+      data.forEach((element, index) => {
+        if (index == 0) appName = `${element}`;
+        else appName = `${appName}-${element}`;
+      });
+      vendorDetails._doc.envDetails = {
+        REACT_APP_CLIENT_ID: config.googleClientId,
+        REACT_APP_API_URL: config.reactApiUrl,
+        REACT_APP_STRIPE_PUBLIC_KEY: config.reactStripeKey,
+      };
 
-       
-        return {
-          statusCode: statusCode.success,
-          message: message.success,
-          data: {...vendorDetails._doc,appName},
-        };
-      } catch (error) {
+      return {
+        statusCode: statusCode.success,
+        message: message.success,
+        data: { ...vendorDetails._doc, appName },
+      };
+    } catch (error) {
+      throw {
+        statusCode: error.statusCode,
+        message: error.message,
+        data: JSON.stringify(error),
+      };
+    }
+  }
+
+  async updateVendorDetails(info) {
+    try {
+      if (!info.vendorId) {
         throw {
-          statusCode: error.statusCode,
-          message: error.message,
-          data: JSON.stringify(error),
+          statusCode: statusCode.bad_request,
+          message: message.badRequest,
+          data: [],
         };
       }
+
+      const updateVendor = await db.vendorDatabase().updateVendorDetails(info);
+
+      return {
+        statusCode: statusCode.success,
+        message: message.success,
+        data: updateVendor,
+      };
+    } catch (error) {
+      throw {
+        statusCode: error.statusCode,
+        message: error.message,
+        data: JSON.stringify(error),
+      };
     }
+  }
 }
 
 module.exports = {

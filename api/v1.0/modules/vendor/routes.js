@@ -1,10 +1,9 @@
-const router = require('express').Router();
-const api = require('./controller');
-const auth=require('../../../../common/authentication');
-
+const router = require("express").Router();
+const api = require("./controller");
+const auth = require("../../../../common/authentication");
 
 // Middle layer for Auth API
-router.get('/',auth.validateToken,api.vendorList)
-router.get('/vendorDetails',api.getVendorDetails)
-
+router.get("/", auth.validateToken, api.vendorList);
+router.get("/vendorDetails", api.getVendorDetails);
+router.put("/vendorDetails", api.updateVendorDetails);
 module.exports = router;
