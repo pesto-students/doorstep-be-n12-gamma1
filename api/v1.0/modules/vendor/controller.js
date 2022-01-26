@@ -36,7 +36,7 @@ const controller = {
   },
 
   updateVendorDetails: async (req, res, next) => {
-    console.log("req", req.files);
+    console.log("req", req);
     try {
       const updatedVendorDetails = await object
         .vendorService()

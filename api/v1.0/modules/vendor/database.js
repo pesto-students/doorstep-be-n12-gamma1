@@ -44,12 +44,11 @@ class VendorDatabase {
   }
 
   async updateVendorDetails(req) {
-    // const vendor = new Vendor(info);
     try {
       const details = await Vendor.findByIdAndUpdate(
         req.params._id,
         {
-          $set: req.body
+          $set: {"isNewer":false,"siteUrl":"https://"+req.params.siteUrl+".herokuapp.com"}
         },
         { new: true }
       );
