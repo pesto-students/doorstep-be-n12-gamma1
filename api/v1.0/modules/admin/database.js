@@ -64,7 +64,7 @@ class AdminDatabase {
             country: res["Country"],
           },
           template_Details: {
-            logoUrl: res["fileURL"],
+            logoUrl: res["Logo Url"],
             primaryColor: res["Primary Color"],
             TextColor: res["Text Color"],
           },
@@ -133,10 +133,12 @@ class AdminDatabase {
         }
         formatedData = {
           title: res["Product Title"],
-          desc: res["Desc"],
+          desc: res["Desc"]?res["Desc"]:null,
           categories: arr,
+          img: res["Image"]?res["Image"]:null,
           unit: res["Unit"],
           price: res["Price"],
+          discounted_price:res["Discounted Price"],
           stock: res["Total Stock"]
         };
         productArr.push(formatedData);

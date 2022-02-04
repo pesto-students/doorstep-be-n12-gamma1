@@ -32,7 +32,7 @@ function dynamicSchema(prefix) {
     },
     { timestamps: true, collection: `${prefix}user` }
   );
-  return mongoose.model(`${prefix}user`, userSchema);
+  return mongoose.models[`${prefix}user`] || mongoose.model(`${prefix}user`, userSchema);
 }
 
 module.exports = dynamicSchema;

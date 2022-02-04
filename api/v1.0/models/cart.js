@@ -19,7 +19,7 @@ const cartSchema = mongoose.Schema(
   { timestamps: true, collection: `${prefix}cart` }
 );
 
-return mongoose.model(`${prefix}cart`, cartSchema);
+return mongoose.models[`${prefix}cart`] || mongoose.model(`${prefix}cart`, cartSchema);
 }
 
 module.exports = dynamicSchema;

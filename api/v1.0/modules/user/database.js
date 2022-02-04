@@ -7,6 +7,7 @@ const config = require("../../../../config");
 const { connection_failed } = require("../../../../common/StatusCode");
 const Cart = require("../../models/cart");
 const stripe = require("stripe")(config.stripeKey);
+const db = require("../../../../common/database/MongoDB");
 
 
 class UserDatabase {
@@ -18,6 +19,9 @@ class UserDatabase {
   async categoryList(info) {
     const query = info.query;
     const Category = CategorySchema(query.prefix);
+    // const modelName=`${query.prefix}category`;
+    // const Category = db.collection(modelName)
+    
 
     let limit = 10;
     let skip = 0;
@@ -32,10 +36,29 @@ class UserDatabase {
 
     // condition = { vendorId: query.vendorId };
     try {
-      const details = await Category.find()
-        .sort({ _id: -1 })
-        .skip(skip)
-        .limit(limit);
+      // const details = await Category.find()
+      //   .sort({ _id: -1 })
+      //   .skip(skip)
+      //   .limit(limit);
+      const details=await Category.aggregate([
+        {
+          $lookup: {
+            from: `${query.prefix}product`,
+            localField: "categoryName",
+            foreignField: "categories",
+            as: "products"
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            categoryName: 1,
+            number_of_product: {
+              $size: "$products"
+            }
+          }
+        }
+      ])
       return details;
     } catch (error) {
       throw {
@@ -67,17 +90,17 @@ class UserDatabase {
       skip = Number(query.skip);
     }
 
-    if (query.category) {
+    if (query.category!=null) {
       condition = {
         categories: { $in: [query.category] },
       };
     }
 
     try {
-      const details = await Product.find(condition)
-        .sort({ _id: -1 })
-        .skip(skip)
-        .limit(limit);
+      const details = await Product.find(condition);
+        // .sort({ _id: -1 })
+        // .skip(skip)
+        // .limit(limit);
       return details;
     } catch (error) {
       throw {

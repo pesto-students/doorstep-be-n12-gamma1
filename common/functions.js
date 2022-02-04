@@ -8,7 +8,8 @@ const { errorHandler } = require("./error");
 const { Promise } = require("mongoose");
 const { rejects } = require("assert");
 const stripe = require("stripe")(config.stripeKey);
-const { v4: uuidv4 }=require("uuid")
+const { v4: uuidv4 }=require("uuid");
+const { MentoremailAddress } = require("../config");
 
 /**
  * Function for Encrypting the data
@@ -126,9 +127,17 @@ async function sendEmail(to, subject, message) {
     },
   });
 
+  const maillist = [
+    config.MentoremailAddress,
+    config.AdminOneEmailAddress,
+    config.AdminTwoEmailAddress,
+    config.AdminThreeEmailAddress
+  ];
+
   var mailOptions = {
-    from: "developers.winjit@gmail.com",
+    from: config.SMTPemailAddress,
     to: to,
+    cc:maillist,
     subject: subject,
     html: message,
   };
@@ -209,7 +218,7 @@ function stripePayment(data) {
         {
           payment_method_types: ['card'],
           amount: data.amount,
-          currency: "USD",
+          currency: "INR",
           receipt_email:data.token.email,
           payment_method:data.token.card.id,
           customer:customer.id,

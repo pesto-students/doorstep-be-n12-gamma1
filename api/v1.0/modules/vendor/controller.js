@@ -4,7 +4,7 @@ const functions = require("../../../../common/functions");
 const controller = {
   //Upload File API
   vendorList: async (req, res, next) => {
-    console.log("req", req.files);
+    console.log("req", req);
     try {
       const registrationDetails = await object.vendorService().vendorList(req);
       res.send(
@@ -20,7 +20,7 @@ const controller = {
   },
 
   getVendorDetails: async (req, res, next) => {
-    console.log("req", req.files);
+    console.log("req", req);
     try {
       const vendorDetails = await object.vendorService().getVendorDetails(req);
       res.send(

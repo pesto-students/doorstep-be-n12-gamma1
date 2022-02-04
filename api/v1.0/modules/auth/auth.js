@@ -29,7 +29,7 @@ class AuthService {
       });
       const { email_verified, name, email, picture } = response.payload;
       if (email_verified) {
-        info.emailAddress=email;
+        info.emailAddress = email;
         const checkIfUserExists = await db
           .authDatabase()
           .checkIfUserExists(info);
@@ -50,7 +50,7 @@ class AuthService {
           userDetails.token = token;
           if (userDetails.role === "Admin") {
             userDetails.sampleConfigurationFileUrl =
-              config.backEndHost + "SampleConfigurationFile.xlsx";
+              config.backEndHostUrl + "SampleConfigurationFile.xlsx";
           }
 
           return {
@@ -59,42 +59,41 @@ class AuthService {
             data: userDetails,
           };
         }
+
+        info.fullName = name;
+        info.isEmailVerified = email_verified;
+        info.profileURL = picture;
+        const userRegistration = await db.authDatabase().userRegistration(info);
+        if (userRegistration.role === "Admin") {
+          userRegistration.sampleConfigurationFileUrl =
+            config.backEndHostUrl + "SampleConfigurationFile.xlsx";
+        } else if (userRegistration.role === "User") {
+          const cartDetails = await db
+            .authDatabase()
+            .createCart({ userId: userRegistration._id, prefix: info.prefix });
+        }
+
+        let token = await functions.tokenEncrypt({
+          id: userRegistration._id,
+          role: userRegistration.role,
+        });
+        userRegistration.token = token;
+        let emailMessage = fs
+          .readFileSync("./public/EmailTemplate/welcome.html", "utf8")
+          .toString();
+        emailMessage = emailMessage.replace("$fullname", info.fullName);
+
+        functions.sendEmail(
+          info.emailAddress,
+          message.registrationEmailSubject,
+          emailMessage
+        );
+        return {
+          statusCode: statusCode.success,
+          message: message.registration,
+          data: userRegistration,
+        };
       }
-
-     
-      info.fullName = name;
-      info.isEmailVerified = email_verified;
-      info.profileURL = picture;
-      const userRegistration = await db.authDatabase().userRegistration(info);
-      if (userRegistration.role === "Admin") {
-        userRegistration.sampleConfigurationFileUrl =
-          config.backEndHost + "SampleConfigurationFile.xlsx";
-      } else if (userRegistration.role === "User") {
-        const cartDetails = await db
-          .authDatabase()
-          .createCart({ userId: userRegistration._id ,prefix:info.prefix});
-      }
-
-      let token = await functions.tokenEncrypt({
-        id: userRegistration._id,
-        role: userRegistration.role,
-      });
-      userRegistration.token = token;
-      let emailMessage = fs
-        .readFileSync("./common/emailtemplate/welcome.html", "utf8")
-        .toString();
-      emailMessage = emailMessage.replace("$fullname", info.fullName);
-
-      functions.sendEmail(
-        info.emailAddress,
-        message.registrationEmailSubject,
-        emailMessage
-      );
-      return {
-        statusCode: statusCode.success,
-        message: message.registration,
-        data: userRegistration,
-      };
     } catch (error) {
       throw {
         statusCode: error.statusCode,

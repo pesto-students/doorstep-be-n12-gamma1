@@ -32,7 +32,7 @@ class VendorDatabase {
   async getVendorDetails() {
     // const vendor = new Vendor(info);
     try {
-      const details = await Vendor.findOne({ isNewer: true },'prefix emailAddress  vendorName');
+      const details = await Vendor.findOne({ isNewer: true },'prefix emailAddress vendorName template_Details');
       return details;
     } catch (error) {
       throw {
@@ -48,7 +48,7 @@ class VendorDatabase {
       const details = await Vendor.findByIdAndUpdate(
         req.params._id,
         {
-          $set: {"isNewer":false,"siteUrl":"https://"+req.params.siteUrl+".herokuapp.com"}
+          $set: {"isNewer":false,"siteUrl":"https://"+req.params.siteUrl+"-doorstep.herokuapp.com"}
         },
         { new: true }
       );

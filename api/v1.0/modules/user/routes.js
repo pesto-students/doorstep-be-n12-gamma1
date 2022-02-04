@@ -3,7 +3,7 @@ const api = require('./controller');
 const auth=require('../../../../common/authentication');
 
 
-// Middle layer for Auth API
+// Middle layer for Auth API 
 router.get('/categoryList',auth.validateToken,api.categoryList);
 router.get('/productList',auth.validateToken,api.productList);
 router.get('/orderList',auth.validateToken,api.orderList);

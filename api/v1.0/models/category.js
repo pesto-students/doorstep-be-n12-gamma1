@@ -19,7 +19,7 @@ const categorySchema = mongoose.Schema(
   { timestamps: true, collection: `${prefix}category` }
 );
 
-return mongoose.model(`${prefix}category`, categorySchema);
+return mongoose.models[`${prefix}category`] || mongoose.model(`${prefix}category`, categorySchema);
 }
 
 module.exports = dynamicSchema;

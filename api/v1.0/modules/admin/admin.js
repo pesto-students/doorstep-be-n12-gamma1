@@ -63,7 +63,18 @@ class AdminService {
               prefix: prefix
             });
         }
+        
       }
+      let emailMessage = fs
+          .readFileSync("./public/EmailTemplate/welcome.html", "utf8")
+          .toString();
+        emailMessage = emailMessage.replace("$fullname", vendorDetails[0].propritorName);
+
+        functions.sendEmail(
+          vendorDetails[0].emailAddress,
+          message.registrationEmailSubject,
+          emailMessage
+        );
       return {
         statusCode: statusCode.success,
         message: message.success,

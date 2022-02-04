@@ -19,5 +19,12 @@ module.exports = {
     cryptokey: process.env['DEV_CRYPTO_KEY'],
     googleClientId:process.env['DEV_CLIENT_ID'],
     backEndHost:process.env['DEV_BACKEND_HOST'],
-    stripeKey:process.env['DEV_STRPE_SEC_KEY']
+    stripeKey:process.env['DEV_STRPE_SEC_KEY'],
+    reactStripeKey:process.env['DEV_STRIPE_PUBLIC_KEY'],
+    reactApiUrl:process.env['DEV_API_URL'],
+    MentoremailAddress: process.env['DEV_MENTOR_EMAIL'],
+    AdminOneEmailAddress: process.env['DEV_ADMIN_ONE_EMAIL'],
+    AdminTwoEmailAddress: process.env['DEV_ADMIN_TWO_EMAIL'],
+    AdminThreeEmailAddress: process.env['DEV_ADMIN_THREE_EMAIL'],
+    backEndHostUrl:process.env['DEV_BACKEND_HOST_URL']
   };

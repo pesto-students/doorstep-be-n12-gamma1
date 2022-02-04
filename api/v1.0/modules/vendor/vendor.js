@@ -4,6 +4,7 @@ const fs = require("fs");
 const db = require("./database");
 const Vendor = require("../../models/vendor");
 const config = require("../../../../config");
+const functions = require("../../../../common/functions");
 
 class VendorService {
   /**
@@ -40,6 +41,7 @@ class VendorService {
   async getVendorDetails(info) {
     try {
       const vendorDetails = await db.vendorDatabase().getVendorDetails();
+      
       if(vendorDetails){
         console.log("vendorDetails",vendorDetails)
       let data = vendorDetails.vendorName.toLowerCase().split(" ");
@@ -69,10 +71,23 @@ class VendorService {
   }
 
   async updateVendorDetails(info) {
-    console.log("infoo",info)
     try {
-      const updateVendor = await db.vendorDatabase().updateVendorDetails(info);
 
+      const updateVendor = await db.vendorDatabase().updateVendorDetails(info);
+      console.log("updateVendor",updateVendor)
+      let emailMessage = fs
+        .readFileSync("./public/EmailTemplate/welcomeVendor.html", "utf8")
+        .toString();
+      emailMessage = emailMessage.replace("$fullname", updateVendor.propritorName)
+      .replace('$link', updateVendor.siteUrl)
+      .replace('$storeName', updateVendor.vendorName)
+      .replace('$emailId', config.supportEmail);
+
+      functions.sendEmail(
+        updateVendor.emailAddress,
+        message.registrationEmailSubject,
+        emailMessage
+      );
       return {
         statusCode: statusCode.success,
         message: message.success,

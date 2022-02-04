@@ -1,8 +1,9 @@
 const mongoose=require("mongoose");
-const { mongoDBConnectionStringCloud } =require("../../config");
+const { mongoDBConnectionStringCloud,mongoDBConnectionStringLocal } =require("../../config");
 
 
 mongoose.connect(mongoDBConnectionStringCloud,{useNewUrlParser:true});
+// mongoose.connect(mongoDBConnectionStringLocal,{useNewUrlParser:true});
 
 const db=mongoose.connection;
 

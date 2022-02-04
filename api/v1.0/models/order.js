@@ -11,8 +11,11 @@ function dynamicSchema(prefix) {
           },
           quantity: {
             type: Number,
-            default: 1,
+            default: 1
           },
+          price:{ type: Number, required: true },
+          img: { type: String }
+          
         },
       ],
       amount: { type: Number, required: true },
@@ -21,7 +24,7 @@ function dynamicSchema(prefix) {
     },
     { timestamps: true, collection: `${prefix}order` }
   );
-  return mongoose.model(`${prefix}order`, orderSchema);
+  return mongoose.models[`${prefix}order`] || mongoose.model(`${prefix}order`, orderSchema);
 }
 
 module.exports = dynamicSchema;
