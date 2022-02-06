@@ -1,6 +1,7 @@
-const functions = require('./functions');
-const statusCode = require('./StatusCode');
-const message = require('./message');
+const functions = require("./functions");
+const statusCode = require("./StatusCode");
+const message = require("./message");
+const redisClient=require('redisclient');
 
 const authenticationController = {
   validateToken: async (req, res, next) => {
@@ -10,9 +11,23 @@ const authenticationController = {
 
         if (tokenDecryptInfo.data) {
           res.locals.tokenInfo = tokenDecryptInfo.data;
-          const token = await functions.tokenEncrypt(tokenDecryptInfo.data);
-          res.header('auth', token);
-          next();
+          req.body.userDetails = tokenDecryptInfo.data;
+          req.body.userDetails.token = req.headers.auth;
+          // const data = await redisClient.redis.get(req.body.userDetails.id);
+          // if (data !== null) {
+          //   const parsedData = JSON.parse(data);
+          //   if (!parsedData[userId].includes(token)) {
+              const token = await functions.tokenEncrypt(tokenDecryptInfo.data);
+              res.header("auth", token);
+              next();
+            // } else {
+            //   throw {
+            //     statusCode: statusCode.unauthorized,
+            //     message: message.sessionExpire,
+            //     data: null,
+            //   };
+            // }
+          // }
         } else {
           throw {
             statusCode: statusCode.unauthorized,

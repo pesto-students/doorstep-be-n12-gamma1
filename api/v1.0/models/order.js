@@ -11,20 +11,40 @@ function dynamicSchema(prefix) {
           },
           quantity: {
             type: Number,
-            default: 1
+            default: 1,
           },
-          price:{ type: Number, required: true },
-          img: { type: String }
-          
+          price: { type: Number, required: true },
+          discounted_price: { type: Number },
+          img: { type: String },
         },
       ],
-      amount: { type: Number, required: true },
-      address: { type: Object, required: true },
+      paymentInfo: {
+        amount: { type: Number, required: true },
+        tax: { type: Number, required: true },
+        total: { type: Number, required: true },
+        stripeTransactionId: { type: String },
+      },
+
+      billingInfo: {
+        fullname: { type: String },
+        contactNumber: { type: String },
+        emailAddress: { type: String },
+        address: {
+          type: String,
+          default:
+            "H NO.-44-3-456/7, STREET NO.-2, XYZ COLONY, MUMBAI, MAHARASHTRA, 324532, India",
+        },
+        deliveryDate: { type: String },
+      },
+
       status: { type: String, default: "pending" },
     },
     { timestamps: true, collection: `${prefix}order` }
   );
-  return mongoose.models[`${prefix}order`] || mongoose.model(`${prefix}order`, orderSchema);
+  return (
+    mongoose.models[`${prefix}order`] ||
+    mongoose.model(`${prefix}order`, orderSchema)
+  );
 }
 
 module.exports = dynamicSchema;

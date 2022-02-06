@@ -34,7 +34,7 @@ module.exports = {
     emailVerificationSuccess:
       'Email address successfully verified. Please login to continue',
     emailLinkExpired: 'Link has expired.',
-    registrationEmailSubject: 'Welcome to CommonAPI',
+    registrationEmailSubject: 'Welcome to @DoorStep Portal',
     passwordChanged: 'Password changed successfully',
     invalidPassword: 'Password is not valid',
     forgotPasswordSubject: 'Common API, Forgot password link',
@@ -52,5 +52,6 @@ module.exports = {
     accountReactivated: 'Account is re-activated',
     sendingEmailFailed: 'Having some issue while sending email',
     invalidImage: 'Image type is not valid',
+    logout:'Logout successfully'
   };
   

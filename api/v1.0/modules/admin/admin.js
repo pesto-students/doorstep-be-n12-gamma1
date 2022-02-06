@@ -40,41 +40,38 @@ class AdminService {
         let sheetData = xlsx.utils.sheet_to_json(
           file.Sheets[file.SheetNames[i]]
         );
-        
-       
+
         if (file.SheetNames[i] === "Vendor Details") {
-          prefix = await functions.getPrefix(sheetData[0]['Vendor Name']);
-          sheetData[0].fileURL=fileURL;
+          prefix = await functions.getPrefix(sheetData[0]["Vendor Name"]);
+          sheetData[0].fileURL = fileURL;
           vendorDetails = await db
             .adminDatabase()
             .vendorRegistration({ vendor: sheetData, prefix: prefix });
         } else if (file.SheetNames[i] === "Categories") {
-          categoryDetails = await db
-            .adminDatabase()
-            .addCategory({
-              category: sheetData,
-              prefix: prefix
-            });
+          categoryDetails = await db.adminDatabase().addCategory({
+            category: sheetData,
+            prefix: prefix,
+          });
         } else {
-          productDetails = await db
-            .adminDatabase()
-            .addProduct({
-              product: sheetData,
-              prefix: prefix
-            });
+          productDetails = await db.adminDatabase().addProduct({
+            product: sheetData,
+            prefix: prefix,
+          });
         }
-        
       }
       let emailMessage = fs
-          .readFileSync("./public/EmailTemplate/welcome.html", "utf8")
-          .toString();
-        emailMessage = emailMessage.replace("$fullname", vendorDetails[0].propritorName);
+        .readFileSync("./public/EmailTemplate/welcome.html", "utf8")
+        .toString();
+      emailMessage = emailMessage.replace(
+        "$fullname",
+        vendorDetails[0].propritorName
+      );
 
-        functions.sendEmail(
-          vendorDetails[0].emailAddress,
-          message.registrationEmailSubject,
-          emailMessage
-        );
+      functions.sendEmail(
+        vendorDetails[0].emailAddress,
+        message.registrationEmailSubject,
+        emailMessage
+      );
       return {
         statusCode: statusCode.success,
         message: message.success,

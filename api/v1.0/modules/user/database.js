@@ -3,6 +3,7 @@ const Vendor = require("../../models/vendor");
 // const Product = require("../../models/product");
 const CategorySchema = require("../../models/category");
 const ProductSchema = require("../../models/product");
+const OrderSchema=require("../../models/order")
 const config = require("../../../../config");
 const { connection_failed } = require("../../../../common/StatusCode");
 const Cart = require("../../models/cart");
@@ -79,7 +80,7 @@ class UserDatabase {
     let condition = {};
     const Product = ProductSchema(query.prefix);
 
-    let limit = 10;
+    let limit = 6;
     let skip = 0;
 
     if (query.limit) {
@@ -91,16 +92,41 @@ class UserDatabase {
     }
 
     if (query.category!=null) {
+      const category=query.category.replace("%","");
       condition = {
-        categories: { $in: [query.category] },
+        categories: { $in: [category] },
       };
     }
 
+
+    if (query.productName!=null) {
+      condition.title= new RegExp(query.productName,'i')
+    // {"name": /.*m.*/}
+    }
+  console.log("condition",condition)
     try {
       const details = await Product.find(condition);
-        // .sort({ _id: -1 })
+        // .sort({ _id: 1 })
         // .skip(skip)
         // .limit(limit);
+      // "productList": [
+      //   { "$match": condition },
+      //   { "$skip": skip },
+      //   { "$limit": limit }
+      // ],
+      // const details=await Product.aggregate([
+      //   { "$facet": {
+      //     "productList": [
+      //       { "$match": condition }
+      //     ],
+      //     "totalCount": [
+      //       { "$count": "count" }
+      //     ]
+      //   }}
+      // ])
+      // if(details && details.length!=0)
+      //   return {productList:details[0].productList,totalCount:details[0].totalCount[0].count};
+      // else  
       return details;
     } catch (error) {
       throw {
@@ -132,9 +158,15 @@ class UserDatabase {
       skip = Number(query.skip);
     }
 
-    condition = {
-      userId: query.userId,
-    };
+    if (query.orderId) {
+      condition = {
+        _id: query.orderId
+      };
+    }
+
+    // condition = {
+    //   userId: query.userId,
+    // };
 
     try {
       const details = await Order.find(condition)
@@ -234,6 +266,78 @@ class UserDatabase {
         cancel_url: 'http://localhost:3000/cancel.html',
       });
       return session;
+    } catch (error) {
+      throw {
+        statusCode: connection_failed,
+        message: error.message,
+        data: JSON.stringify(error),
+      };
+    }
+  }
+
+  /**
+   * Database call for getting product List
+   * @param {*} req (user details)
+   * @param {*} res (json with success/failure)
+   */
+   async addOrder(info,paymentDetails) {
+    let query = info.query;
+    const Order = OrderSchema(query.prefix);
+
+    let product_data=[];
+    info.body.productList.map((product)=>{
+     let data={ productId: product._id,
+      quantity: product.qty,
+      price:product.price,
+      discounted_price:product.discounted_price,
+      img: product.img
+    }
+    product_data.push(data);
+    })
+
+    let concat_Address=info.body.deliveryInfo.address.length!=0?`${info.body.deliveryInfo.address}, ${info.body.deliveryInfo.city}, ${info.body.deliveryInfo.stateCountry} - ${info.body.deliveryInfo.zipCode}`:null;
+    let fullName=info.body.deliveryInfo.firstname.length!=0?`${info.body.deliveryInfo.firstname} ${info.body.deliveryInfo.lastname}`:info.body.userInfo.fullName;
+    let emailAddress=info.body.deliveryInfo.emailAddress.length!=0?info.body.deliveryInfo.emailAddress:info.body.userInfo.emailAddress;
+    info.body.paymentInfo.stripeTransactionId=paymentDetails.id;
+    const orderDetails={
+      userId: info.body.userDetails.id,
+      products: product_data,
+      paymentInfo:info.body.paymentInfo,
+      billingInfo:{
+      fullname:fullName,
+      contactNumber:info.body.deliveryInfo.contactNumber,
+      emailAddress:emailAddress,
+      address: concat_Address,
+      deliveryDate:info.body.delivery_date
+      }
+    }
+    const newOrder = new Order(orderDetails);
+
+    // let limit = 10;
+    // let skip = 0;
+
+    // if (query.limit) {
+    //   limit = Number(query.limit);
+    // }
+
+    // if (query.skip) {
+    //   skip = Number(query.skip);
+    // }
+
+    // if (query.category!=null) {
+    //   condition = {
+    //     categories: { $in: [query.category] },
+    //   };
+    // }
+
+    try {
+      const details = await newOrder.save();
+        // .sort({ _id: -1 })
+        // .skip(skip)
+        // .limit(limit);
+        let data=[];
+        data.push(details)
+      return data;
     } catch (error) {
       throw {
         statusCode: connection_failed,

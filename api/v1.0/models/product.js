@@ -10,7 +10,7 @@ function dynamicSchema(prefix) {
       size: { type: Array },
       unit: { type: String },
       price: { type: Number, required: true },
-      discounted_price: { type: Number},
+      discounted_price: { type: Number },
       stock: { type: Number, required: true },
       inStock: { type: Boolean, default: true },
       isDeleted: {
@@ -20,7 +20,10 @@ function dynamicSchema(prefix) {
     },
     { timestamps: true, collection: `${prefix}product` }
   );
-  return mongoose.models[`${prefix}product`] || mongoose.model(`${prefix}product`, productSchema);
+  return (
+    mongoose.models[`${prefix}product`] ||
+    mongoose.model(`${prefix}product`, productSchema)
+  );
 }
 
 module.exports = dynamicSchema;

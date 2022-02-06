@@ -1,25 +1,28 @@
 const mongoose = require("mongoose");
 
-function dynamicSchema(prefix){
-const cartSchema = mongoose.Schema(
-  {
-    userId: { type: String, required: true },
-    products: [
-      {
-        productId: {
-          type: String,
+function dynamicSchema(prefix) {
+  const cartSchema = mongoose.Schema(
+    {
+      userId: { type: String, required: true },
+      products: [
+        {
+          productId: {
+            type: String,
+          },
+          quantity: {
+            type: Number,
+            default: 1,
+          },
         },
-        quantity: {
-          type: Number,
-          default: 1,
-        },
-      },
-    ],
-  },
-  { timestamps: true, collection: `${prefix}cart` }
-);
+      ],
+    },
+    { timestamps: true, collection: `${prefix}cart` }
+  );
 
-return mongoose.models[`${prefix}cart`] || mongoose.model(`${prefix}cart`, cartSchema);
+  return (
+    mongoose.models[`${prefix}cart`] ||
+    mongoose.model(`${prefix}cart`, cartSchema)
+  );
 }
 
 module.exports = dynamicSchema;

@@ -7,6 +7,7 @@ const fs = require("fs");
 const db = require("./database");
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(config.googleClientId);
+const redisClient = require("redisclient");
 
 class AuthService {
   /**
@@ -60,18 +61,16 @@ class AuthService {
           };
         }
 
+        if(info.role !== "Admin"){
+
         info.fullName = name;
         info.isEmailVerified = email_verified;
         info.profileURL = picture;
         const userRegistration = await db.authDatabase().userRegistration(info);
-        if (userRegistration.role === "Admin") {
-          userRegistration.sampleConfigurationFileUrl =
-            config.backEndHostUrl + "SampleConfigurationFile.xlsx";
-        } else if (userRegistration.role === "User") {
-          const cartDetails = await db
-            .authDatabase()
-            .createCart({ userId: userRegistration._id, prefix: info.prefix });
-        }
+        // if (userRegistration.role === "Admin") {
+        //   userRegistration.sampleConfigurationFileUrl =
+        //     config.backEndHostUrl + "SampleConfigurationFile.xlsx";
+        // }
 
         let token = await functions.tokenEncrypt({
           id: userRegistration._id,
@@ -94,6 +93,44 @@ class AuthService {
           data: userRegistration,
         };
       }
+      }
+    } catch (error) {
+      throw {
+        statusCode: error.statusCode,
+        message: error.message,
+        data: JSON.stringify(error),
+      };
+    }
+  }
+
+  async logout(info) {
+    try {
+      if (!info.query.prefix) {
+        throw {
+          statusCode: statusCode.bad_request,
+          message: message.badRequest,
+          data: [],
+        };
+      }
+
+      const { userId, token } = info.body.userDetails;
+      const blackList = await redisClient.get(userId);
+      if (blackList !== null) {
+        const parsedData = JSON.parse(blackList);
+        parsedData[userId].push(token);
+        redisClient.setex(userId, 3600, JSON.stringify(parsedData));
+      } else {
+        const blacklistData = {
+          [userId]: [token],
+        };
+        redisClient.setex(userId, 3600, JSON.stringify(blacklistData));
+      }
+
+      return {
+        statusCode: statusCode.success,
+        message: message.logout,
+        data: null,
+      };
     } catch (error) {
       throw {
         statusCode: error.statusCode,

@@ -41,25 +41,25 @@ class VendorService {
   async getVendorDetails(info) {
     try {
       const vendorDetails = await db.vendorDatabase().getVendorDetails();
-      
-      if(vendorDetails){
-        console.log("vendorDetails",vendorDetails)
-      let data = vendorDetails.vendorName.toLowerCase().split(" ");
-      let appName = "";
-      data.forEach((element, index) => {
-        appName =index==0?`${element}`:`${appName}-${element}`
-      });
-      vendorDetails._doc.envDetails = {
-        REACT_APP_CLIENT_ID: config.googleClientId,
-        REACT_APP_API_URL: config.reactApiUrl,
-        REACT_APP_STRIPE_PUBLIC_KEY: config.reactStripeKey,
-      };
-      vendorDetails._doc.appName=appName
-    }
+
+      if (vendorDetails) {
+        console.log("vendorDetails", vendorDetails);
+        let data = vendorDetails.vendorName.toLowerCase().split(" ");
+        let appName = "";
+        data.forEach((element, index) => {
+          appName = index == 0 ? `${element}` : `${appName}-${element}`;
+        });
+        vendorDetails._doc.envDetails = {
+          REACT_APP_CLIENT_ID: config.googleClientId,
+          REACT_APP_API_URL: config.reactApiUrl,
+          REACT_APP_STRIPE_PUBLIC_KEY: config.reactStripeKey,
+        };
+        vendorDetails._doc.appName = appName;
+      }
       return {
         statusCode: statusCode.success,
         message: message.success,
-        data: vendorDetails
+        data: vendorDetails,
       };
     } catch (error) {
       throw {
@@ -72,16 +72,16 @@ class VendorService {
 
   async updateVendorDetails(info) {
     try {
-
       const updateVendor = await db.vendorDatabase().updateVendorDetails(info);
-      console.log("updateVendor",updateVendor)
+      console.log("updateVendor", updateVendor);
       let emailMessage = fs
         .readFileSync("./public/EmailTemplate/welcomeVendor.html", "utf8")
         .toString();
-      emailMessage = emailMessage.replace("$fullname", updateVendor.propritorName)
-      .replace('$link', updateVendor.siteUrl)
-      .replace('$storeName', updateVendor.vendorName)
-      .replace('$emailId', config.supportEmail);
+      emailMessage = emailMessage
+        .replace("$fullname", updateVendor.propritorName)
+        .replace("$link", updateVendor.siteUrl)
+        .replace("$storeName", updateVendor.vendorName)
+        .replace("$emailId", config.supportEmail);
 
       functions.sendEmail(
         updateVendor.emailAddress,

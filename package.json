@@ -28,6 +28,7 @@
     "nodemailer": "^6.7.2",
     "nodemon": "^2.0.15",
     "randomstring": "^1.2.1",
+    "redisclient": "^0.0.8",
     "shelljs": "^0.8.5",
     "stripe": "^8.197.0",
     "swagger-ui-express": "^4.3.0",

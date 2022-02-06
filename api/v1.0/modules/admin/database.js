@@ -4,7 +4,6 @@ const ProductSchema = require("../../models/product");
 const { connection_failed } = require("../../../../common/StatusCode");
 const functions = require("../../../../common/functions");
 
-
 class AdminDatabase {
   /**
    * Database call for inserting user information
@@ -49,7 +48,6 @@ class AdminDatabase {
     let formatedData;
     try {
       vendorDetails.forEach((res) => {
-        
         formatedData = {
           propritorName: res["Propritor Name"],
           vendorName: res["Vendor Name"],
@@ -68,8 +66,8 @@ class AdminDatabase {
             primaryColor: res["Primary Color"],
             TextColor: res["Text Color"],
           },
-          prefix:info.prefix,
-          isNewer:true
+          prefix: info.prefix,
+          isNewer: true,
         };
         vendorArr.push(formatedData);
       });
@@ -98,7 +96,7 @@ class AdminDatabase {
     try {
       categoryDetails.forEach((res) => {
         formatedData = {
-          categoryName: res["Category Name"]
+          categoryName: res["Category Name"],
         };
         categoryArr.push(formatedData);
       });
@@ -133,13 +131,13 @@ class AdminDatabase {
         }
         formatedData = {
           title: res["Product Title"],
-          desc: res["Desc"]?res["Desc"]:null,
+          desc: res["Desc"] ? res["Desc"] : null,
           categories: arr,
-          img: res["Image"]?res["Image"]:null,
+          img: res["Image"] ? res["Image"] : null,
           unit: res["Unit"],
           price: res["Price"],
-          discounted_price:res["Discounted Price"],
-          stock: res["Total Stock"]
+          discounted_price: res["Discounted Price"],
+          stock: res["Total Stock"],
         };
         productArr.push(formatedData);
       });

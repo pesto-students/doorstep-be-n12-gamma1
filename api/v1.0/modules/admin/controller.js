@@ -1,14 +1,12 @@
-const object = require('./admin');
-const functions = require('../../../../common/functions');
+const object = require("./admin");
+const functions = require("../../../../common/functions");
 
 const controller = {
   //Upload File API
   uploadFile: async (req, res, next) => {
-    console.log("req",req.files)
+    console.log("req", req.files);
     try {
-      const registrationDetails = await object
-        .adminService()
-        .uploadFile(req);
+      const registrationDetails = await object.adminService().uploadFile(req);
       res.send(
         functions.responseGenerator(
           registrationDetails.statusCode,
@@ -19,7 +17,7 @@ const controller = {
     } catch (error) {
       return next(error);
     }
-  }
-}
+  },
+};
 
-  module.exports = controller;
+module.exports = controller;

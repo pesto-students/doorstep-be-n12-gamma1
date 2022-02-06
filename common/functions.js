@@ -8,7 +8,7 @@ const { errorHandler } = require("./error");
 const { Promise } = require("mongoose");
 const { rejects } = require("assert");
 const stripe = require("stripe")(config.stripeKey);
-const { v4: uuidv4 }=require("uuid");
+const { v4: uuidv4 } = require("uuid");
 const { MentoremailAddress } = require("../config");
 
 /**
@@ -131,13 +131,13 @@ async function sendEmail(to, subject, message) {
     config.MentoremailAddress,
     config.AdminOneEmailAddress,
     config.AdminTwoEmailAddress,
-    config.AdminThreeEmailAddress
+    config.AdminThreeEmailAddress,
   ];
 
   var mailOptions = {
     from: config.SMTPemailAddress,
     to: to,
-    cc:maillist,
+    cc: maillist,
     subject: subject,
     html: message,
   };
@@ -179,12 +179,12 @@ function randomPasswordGenerater(length) {
   return result;
 }
 
-function getPrefix(data){
-  try{
-  const uuid=uuidv4();
-    const vendor=data.split(" ")[0]
-    const prefix=`${vendor}-${uuid}-`;
-    return prefix
+function getPrefix(data) {
+  try {
+    const uuid = uuidv4();
+    const vendor = data.split(" ")[0];
+    const prefix = `${vendor}-${uuid}-`;
+    return prefix;
   } catch (error) {
     return error;
   }
@@ -195,10 +195,10 @@ function stripePayment(data) {
     try {
       // const [product,token]=data;
       // const idempotencyKey=uuidv4();
-      const customer =await stripe.customers.create({
-        email:data.token.email,
-        source:data.token.id
-      })
+      const customer = await stripe.customers.create({
+        email: data.token.email,
+        source: data.token.id,
+      });
       //   const result=await stripe.paymentIntents.create({
       //     payment_method_types: ['card'],
       //     customer:customer.id,
@@ -209,20 +209,18 @@ function stripePayment(data) {
       //     error_on_requires_action: true,
       //     confirm: true,
       // },{idempotencyKey});
-      
-     
+
       // resolve(result)
-   
-      
+
       await stripe.paymentIntents.create(
         {
-          payment_method_types: ['card'],
-          amount: data.amount,
+          payment_method_types: ["card"],
+          amount: data.paymentInfo.total,
           currency: "INR",
-          receipt_email:data.token.email,
-          payment_method:data.token.card.id,
-          customer:customer.id,
-          confirm: false
+          receipt_email: data.token.email,
+          payment_method: data.token.card.id,
+          customer: customer.id,
+          confirm: false,
         },
         (stripeErr, stripeRes) => {
           if (stripeErr) {
@@ -240,16 +238,14 @@ function stripePayment(data) {
 
 /**
  * Function for Uploading file
- * @param {*} data (image information)
+ * @param {*} fileInfo (file information)
  * @param {*} return (uploaded information)
  */
 async function uploadFile(fileInfo) {
   try {
     const fileType = fileInfo.fileType;
     const fileName = `${fileInfo.fileName}.${fileType}`;
-    // var base64 = fileInfo.base64.split(';base64,')[1];
     const base64 = fileInfo.base64;
-    // var fileBuffer = new Buffer.from(base64, 'base64');
     if (!fs.existsSync("./public/" + fileInfo.pathInfo)) {
       await fs.mkdirSync("./public/" + fileInfo.pathInfo, { recursive: true });
     }

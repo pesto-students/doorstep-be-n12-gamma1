@@ -16,13 +16,13 @@ class UserService {
    */
   async categoryList(info) {
     try {
-      // if (!info.vendorId) {
-      //   throw {
-      //     statusCode: statusCode.bad_request,
-      //     message: message.badRequest,
-      //     data: [],
-      //   };
-      // }
+      if (!info.query.prefix) {
+        throw {
+          statusCode: statusCode.bad_request,
+          message: message.badRequest,
+          data: [],
+        };
+      }
 
       const categoryList = await db.userDatabase().categoryList(info);
 
@@ -47,13 +47,13 @@ class UserService {
    */
   async productList(info) {
     try {
-      // if (!info.vendorId) {
-      //   throw {
-      //     statusCode: statusCode.bad_request,
-      //     message: message.badRequest,
-      //     data: [],
-      //   };
-      // }
+      if (!info.query.prefix) {
+        throw {
+          statusCode: statusCode.bad_request,
+          message: message.badRequest,
+          data: [],
+        };
+      }
 
       const productList = await db.userDatabase().productList(info);
 
@@ -78,13 +78,13 @@ class UserService {
    */
   async orderList(info) {
     try {
-      // if (!info.vendorId) {
-      //   throw {
-      //     statusCode: statusCode.bad_request,
-      //     message: message.badRequest,
-      //     data: [],
-      //   };
-      // }
+      if (!info.query.prefix) {
+        throw {
+          statusCode: statusCode.bad_request,
+          message: message.badRequest,
+          data: [],
+        };
+      }
 
       const orderList = await db.userDatabase().orderList(info);
 
@@ -109,13 +109,13 @@ class UserService {
    */
   async getCart(info) {
     try {
-      // if (!info.vendorId) {
-      //   throw {
-      //     statusCode: statusCode.bad_request,
-      //     message: message.badRequest,
-      //     data: [],
-      //   };
-      // }
+      if (!info.query.prefix) {
+        throw {
+          statusCode: statusCode.bad_request,
+          message: message.badRequest,
+          data: [],
+        };
+      }
 
       const cartDetails = await db.userDatabase().getCart(info);
 
@@ -140,14 +140,6 @@ class UserService {
    */
   async getVendorDetails(info) {
     try {
-      // if (!info.vendorId) {
-      //   throw {
-      //     statusCode: statusCode.bad_request,
-      //     message: message.badRequest,
-      //     data: [],
-      //   };
-      // }
-
       const vendorDetails = await db.userDatabase().getVendorDetails(info);
 
       return {
@@ -166,20 +158,21 @@ class UserService {
 
   async payment(info) {
     try {
-      // if (!info.vendorId) {
-      //   throw {
-      //     statusCode: statusCode.bad_request,
-      //     message: message.badRequest,
-      //     data: [],
-      //   };
-      // }
+    
+      if (!info.query.prefix) {
+        throw {
+          statusCode: statusCode.bad_request,
+          message: message.badRequest,
+          data: [],
+        };
+      }
       const paymentDetails = await functions.stripePayment(info.body);
-      // const paymentDetails = await db.userDatabase().stripePayment(info.body);
+      const orderDetails = await db.userDatabase().addOrder(info,paymentDetails);
 
       return {
         statusCode: statusCode.success,
         message: message.success,
-        data: paymentDetails,
+        data: orderDetails,
       };
     } catch (error) {
       throw {
@@ -189,6 +182,8 @@ class UserService {
       };
     }
   }
+
+  
 }
 
 module.exports = {
