@@ -1,5 +1,5 @@
-const object = require("./auth");
-const functions = require("../../../../common/functions");
+const object = require('./auth');
+const functions = require('../../../../common/functions');
 
 const controller = {
   //User Registration API
@@ -21,7 +21,9 @@ const controller = {
   },
   logout: async (req, res, next) => {
     try {
-      const logoutDetails = await object.authService().logout(req);
+      const logoutDetails = await object
+        .authService()
+        .logout(req);
       res.send(
         functions.responseGenerator(
           logoutDetails.statusCode,
@@ -32,7 +34,7 @@ const controller = {
     } catch (error) {
       return next(error);
     }
-  },
-};
+  }
+}
 
-module.exports = controller;
+  module.exports = controller;
